@@ -16,9 +16,10 @@ PUFFERLIB_EXAMPLE_MODULES = (
 def check_example_modules() -> None:
     code = (
         "import importlib\n"
+        "import importlib.metadata\n"
         "import shutil\n"
-        "import gymnasium\n"
         "import pufferlib\n"
+        "import gymnasium\n"
         f"modules = {PUFFERLIB_EXAMPLE_MODULES!r}\n"
         "for module_name in modules:\n"
         "    importlib.import_module(module_name)\n"
@@ -26,7 +27,7 @@ def check_example_modules() -> None:
         "if puffer_cli is None:\n"
         "    raise RuntimeError('Could not find the puffer CLI on PATH')\n"
         "print(f'pufferlib={getattr(pufferlib, \"__version__\", \"unknown\")}')\n"
-        "print(f'gymnasium={gymnasium.__version__}')\n"
+        "print(f'gymnasium={importlib.metadata.version(\"gymnasium\")}')\n"
         "print(f'puffer={puffer_cli}')\n"
     )
 
@@ -53,6 +54,8 @@ def check_example_modules() -> None:
 
     if result.stdout:
         print(result.stdout, end="")
+    if result.stderr:
+        sys.stderr.write(result.stderr)
 
 
 def main() -> None:
