@@ -16,11 +16,13 @@ PufferLib release available from PyPI: `pufferlib==3.0.0` with
 
 ```bash
 uv run python examples/smoke_pufferlib.py
+uv run python -m unittest discover -s tests
 ```
 
 The smoke script verifies that the PufferLib package, the modules used by
 PufferLib's own examples, Gymnasium, and the `puffer` CLI are available in the
-local environment.
+local environment. The unittest suite checks the repo-owned environment's
+observation, action, reward, termination, and truncation semantics.
 
 ## Tiny local rollout
 
@@ -28,8 +30,12 @@ local environment.
 uv run python examples/line_world_pufferlib.py
 ```
 
-`line_world_pufferlib.py` defines a small `gymnasium.Env`, wraps it with
-`pufferlib.emulation.GymnasiumPufferEnv`, and runs four vectorized environments
+`examples/envs/line_world.py` defines `LineWorldEnv`, a small `gymnasium.Env`
+with a two-value observation `[position_fraction, elapsed_fraction]`, two
+actions (`0` left, `1` right), a `+1.0` goal reward, and a `-0.01` step cost.
+Episodes terminate at the rightmost goal or truncate at `max_steps`.
+`line_world_pufferlib.py` wraps that environment with
+`pufferlib.emulation.GymnasiumPufferEnv` and runs four vectorized environments
 through `pufferlib.vector.Serial`. It is intentionally small enough to use as a
 starting point for repo-specific examples.
 
