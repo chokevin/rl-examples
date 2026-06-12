@@ -5,8 +5,13 @@ description = "Reinforcement learning examples powered by PufferLib"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "gymnasium==0.29.1",
+    "gymnasium[mujoco]==0.29.1",
     "pufferlib==3.0.0",
+]
+
+[project.optional-dependencies]
+warp = [
+    "mujoco-warp==3.9.0.1",
 ]
 
 [tool.uv]
