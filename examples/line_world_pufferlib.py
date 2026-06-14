@@ -1,29 +1,14 @@
-"""Run a tiny Gymnasium environment through PufferLib vectorization."""
+"""Run a tiny Gymnasium environment with the PufferLib 4-compatible runner."""
 
 from __future__ import annotations
 
 import argparse
-from typing import Any
 
 import numpy as np
-import pufferlib.emulation
-import pufferlib.vector
+import pufferlib
 
 from envs import LineWorldEnv
-
-
-def make_env(
-    size: int = 5,
-    max_steps: int = 8,
-    buf: dict[str, np.ndarray] | None = None,
-    seed: int | None = 0,
-) -> Any:
-    return pufferlib.emulation.GymnasiumPufferEnv(
-        env_creator=LineWorldEnv,
-        env_kwargs={"size": size, "max_steps": max_steps},
-        buf=buf,
-        seed=seed,
-    )
+from pufferlib4 import SerialVectorEnv
 
 
 def positions_from_observations(observations: np.ndarray, size: int) -> list[int]:
@@ -35,18 +20,20 @@ def rounded_values(values: np.ndarray) -> list[float]:
 
 
 def run_rollout(num_envs: int, steps: int, size: int, max_steps: int, seed: int) -> None:
-    envs = pufferlib.vector.make(
-        make_env,
-        env_kwargs={"size": size, "max_steps": max_steps},
-        backend=pufferlib.vector.Serial,
-        num_envs=num_envs,
-        seed=seed,
+    envs = SerialVectorEnv(
+        [
+            lambda: LineWorldEnv(
+                size=size,
+                max_steps=max_steps,
+            )
+            for _ in range(num_envs)
+        ]
     )
 
     try:
         observations, _ = envs.reset(seed=seed)
         print(
-            f"LineWorld via PufferLib: envs={envs.num_envs} "
+            f"LineWorld with PufferLib {pufferlib.__version__}: envs={envs.num_envs} "
             f"obs_space={envs.single_observation_space} "
             f"action_space={envs.single_action_space}"
         )
